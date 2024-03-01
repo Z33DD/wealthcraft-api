@@ -1,5 +1,7 @@
 from contextvars import ContextVar
 from enum import Enum, auto
+from functools import cache
+import tomllib
 from typing import Optional
 from pydantic import PostgresDsn
 from pydantic_settings import BaseSettings
@@ -38,6 +40,11 @@ class Settings(BaseSettings):
         )
 
         return engine
+
+    def metadata(self) -> dict:
+        with open("pyproject.toml", "rb") as f:
+            data = tomllib.load(f)
+        return data["tool"]["poetry"]
 
 
 settings: ContextVar[Settings] = ContextVar(
