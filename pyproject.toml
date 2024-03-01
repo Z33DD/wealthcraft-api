@@ -1,0 +1,32 @@
+[tool.poetry]
+name = "wealthcraft-api"
+version = "0.1.0"
+description = "The backend fot the WealthCraft finances manager"
+authors = ["Pedro Moreira <pedro@z33dd.com>"]
+license = "The Unlicense"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+fastapi = "^0.110.0"
+sqlmodel = "^0.0.16"
+bcrypt = "^4.1.2"
+httpx = "^0.27.0"
+pydantic = {extras = ["email"], version = "^2.6.3"}
+pyjwt = "^2.8.0"
+typer = {extras = ["rich"], version = "^0.9.0"}
+rich = "^13.7.1"
+shellingham = "^1.5.4"
+uvicorn = "^0.27.1"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.0.2"
+pre-commit = "^3.6.2"
+pydantic-settings = "^2.2.1"
+httpx = "^0.27.0"
+faker = "^23.3.0"
+pylama = "^8.4.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
