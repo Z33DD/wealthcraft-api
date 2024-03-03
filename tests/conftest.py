@@ -1,7 +1,7 @@
 import os
 import random
 import pytest
-from typing import Callable, Optional
+from typing import Any, Callable, Generator, Optional
 from fastapi.testclient import TestClient
 from sqlmodel import SQLModel, Session
 from wealthcraft.config import Settings, settings
@@ -14,11 +14,8 @@ from wealthcraft.services.auth import hash_password
 
 
 @pytest.fixture()
-def test_client():
-    config = Settings(
-        create_tables=True,
-        debug=False,
-    )
+def test_client() -> Generator[TestClient, Any, None]:
+    config = Settings()
 
     app = server_factory(config)
     yield TestClient(app)

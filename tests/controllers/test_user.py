@@ -1,4 +1,5 @@
 from fastapi.testclient import TestClient
+from fastapi import status
 from faker import Faker
 
 
@@ -10,4 +11,4 @@ def test_create_account(test_client: TestClient, faker: Faker):
     }
     response = test_client.post("/user/account", json=payload)
 
-    assert response.status_code == 200
+    assert response.status_code == status.HTTP_200_OK

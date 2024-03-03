@@ -1,5 +1,4 @@
-from http import HTTPStatus
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, status
 from pydantic import BaseModel, EmailStr
 from wealthcraft.dao import DAO
 
@@ -28,4 +27,4 @@ async def create_account(user_data: CreateUser, dao: DAO = Depends(get_dao)):
     return {
         "id": user.id,
         "message": "User created!",
-    }, HTTPStatus.OK
+    }, status.HTTP_201_CREATED

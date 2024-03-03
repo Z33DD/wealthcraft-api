@@ -7,7 +7,7 @@ def test_create_user(dao: DAO, faker: Faker, faker_seed):
 
     email = faker.email()
     name = faker.name()
-    password = b"password"
+    password = "password"
 
     user = User(
         name=name,

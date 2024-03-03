@@ -17,7 +17,7 @@ class User(SQLModel, table=True):
     created_at: datetime = Field(default_factory=datetime.now)
     name: str
     email: EmailStr = Field(sa_column=Column(String, index=True, unique=True))
-    password: Optional[bytes]
+    password: Optional[str]
 
     categories: list["Category"] = Relationship()
     expenses: list["Expense"] = Relationship()

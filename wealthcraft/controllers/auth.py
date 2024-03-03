@@ -1,5 +1,4 @@
-from http import HTTPStatus
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, EmailStr
 from wealthcraft.dao import DAO
 
@@ -20,10 +19,10 @@ async def authenticate(credentials: Credentials, dao: DAO = Depends(get_dao)):
     user = dao.user.query_one(User.email, credentials.email)
     if not user:
         raise HTTPException(
-            status_code=HTTPStatus.NOT_FOUND,
+            status_code=status.HTTP_404_NOT_FOUND,
             detail=f"User with email {credentials.email} not found.",
         )
 
     token = authenticate_user(user, credentials.password)
 
-    return {"token": token}, 200
+    return {"token": token}, status.HTTP_200_OK
