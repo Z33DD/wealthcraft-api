@@ -1,6 +1,5 @@
 import pprint
 from typing import Optional
-from sqlmodel import SQLModel
 import typer
 import uvicorn
 import pytest
@@ -26,6 +25,7 @@ def serve():
             port=config.port,
             log_level=config.log_level.value,
             use_colors=True,
+            reload=True,
         )
     )
     server.run()

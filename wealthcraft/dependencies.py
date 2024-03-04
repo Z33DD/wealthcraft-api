@@ -1,5 +1,5 @@
 from typing import Any, Generator
-from sqlmodel import SQLModel, Session
+from sqlmodel import Session
 from fastapi.security import OAuth2PasswordBearer
 
 from wealthcraft.config import settings

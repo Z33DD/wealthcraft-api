@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from wealthcraft.config import Settings, settings
 from contextlib import asynccontextmanager
+from sqlmodel import SQLModel
 
 from wealthcraft.controllers import auth, user, category
 from wealthcraft.models import *

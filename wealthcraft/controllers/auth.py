@@ -14,8 +14,16 @@ class Credentials(BaseModel):
     password: str
 
 
-@router.post("/login")
-async def authenticate(credentials: Credentials, dao: DAO = Depends(get_dao)):
+class ResponseSchema(BaseModel):
+    access_token: str
+    token_type: str
+    user_id: str
+
+
+@router.post("/login", status_code=status.HTTP_200_OK)
+async def authenticate(
+    credentials: Credentials, dao: DAO = Depends(get_dao)
+) -> ResponseSchema:
     user = dao.user.query_one(User.email, credentials.email)
     if not user:
         raise HTTPException(
@@ -25,4 +33,8 @@ async def authenticate(credentials: Credentials, dao: DAO = Depends(get_dao)):
 
     token = authenticate_user(user, credentials.password)
 
-    return {"token": token}, status.HTTP_200_OK
+    return ResponseSchema(
+        access_token=token,
+        token_type="bearer",
+        user_id=str(user.id),
+    )
