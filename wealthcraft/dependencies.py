@@ -1,4 +1,5 @@
 from typing import Any, Generator
+import sqlalchemy
 from sqlmodel import Session
 from fastapi.security import OAuth2PasswordBearer
 
@@ -24,7 +25,10 @@ def get_dao() -> Generator[DAO, Any, None]:
 
     with Session(engine) as session:
         yield DAO(session)
-        session.commit()
+        try:
+            session.commit()
+        except sqlalchemy.exc.StatementError as ex:
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 async def get_current_user(

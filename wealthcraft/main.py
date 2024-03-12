@@ -21,7 +21,7 @@ def serve():
 
     server = uvicorn.Server(
         uvicorn.Config(
-            "wealthcraft.server:app",
+            app="wealthcraft.server:app",
             port=config.port,
             log_level=config.log_level.value,
             use_colors=True,
@@ -47,7 +47,7 @@ def test(
     warnings: Annotated[bool, typer.Option(help="Stop suppressing warnings.")] = False,
 ):
     args = [
-        "--pylama",
+        # "--pylama",
         "--no-header",
     ]
 

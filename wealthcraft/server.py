@@ -3,7 +3,7 @@ from wealthcraft.config import Settings, settings
 from contextlib import asynccontextmanager
 from sqlmodel import SQLModel
 
-from wealthcraft.controllers import auth, user, category
+from wealthcraft.controllers import auth, user, category, expense
 from wealthcraft.models import *
 
 
@@ -27,6 +27,7 @@ def server_factory(config: Settings) -> FastAPI:
     app.include_router(auth.router)
     app.include_router(user.router)
     app.include_router(category.router)
+    app.include_router(expense.router)
     return app
 
 

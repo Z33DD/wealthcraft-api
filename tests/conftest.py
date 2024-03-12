@@ -75,6 +75,8 @@ def category_factory(dao: DAO) -> Callable[..., Category]:
         if not name:
             name = "".join([random.choice(string.digits) for _ in range(10)])
 
+        assert user.id
+
         category = Category(
             name=name,
             user_id=user.id,
@@ -113,9 +115,11 @@ def expense_factory(
         if not price:
             price = random.uniform(1.0, 100)
 
+        assert user.id
+        assert category.id
+
         expense = Expense(
             date=expense_date,
-            name=name,
             price=price,
             user_id=user.id,
             category_id=category.id,

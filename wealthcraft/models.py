@@ -36,6 +36,7 @@ class Expense(SQLModel, table=True):
     date: date
     price: float
     payment_type: PaymentType
+    description: Optional[str] = None
     category_id: uuid.UUID = Field(foreign_key="category.id")
     user_id: uuid.UUID = Field(foreign_key="user.id")
     user: User = Relationship(back_populates="expenses")
