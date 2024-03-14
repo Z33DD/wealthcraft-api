@@ -3,14 +3,12 @@ from typing import Optional
 import typer
 import uvicorn
 import pytest
-from alembic.config import Config
-from alembic import command
 
 
 from typing_extensions import Annotated
 
 from wealthcraft.config import settings
-from wealthcraft.models import *
+from wealthcraft.models import execute_migration
 
 app = typer.Typer()
 
@@ -34,17 +32,16 @@ def serve():
 @app.command(help="Run the server.")
 def migrate():
     config = settings.get()
-
-    alembic_cfg = Config()
-    alembic_cfg.set_main_option("sqlalchemy.url", config.get_dsn())
-    alembic_cfg.set_main_option("script_location", config.full_path("/migrations"))
-    command.upgrade(alembic_cfg, "head")
+    execute_migration(config.get_dsn())
 
 
 @app.command(help="Executes all tests and verifications.")
 def test(
     name: Optional[str] = None,
-    warnings: Annotated[bool, typer.Option(help="Stop suppressing warnings.")] = False,
+    warnings: Annotated[
+        bool,
+        typer.Option(help="Stop suppressing warnings."),
+    ] = False,
 ):
     args = [
         # "--pylama",

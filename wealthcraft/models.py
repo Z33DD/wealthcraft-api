@@ -5,6 +5,21 @@ from typing import Optional
 from pydantic import EmailStr
 import uuid
 import enum
+from alembic.config import Config
+from alembic import command
+from wealthcraft.config import settings
+
+
+def execute_migration(db_url: str):
+    config = settings.get()
+
+    alembic_cfg = Config()
+    alembic_cfg.set_main_option("sqlalchemy.url", db_url)
+    alembic_cfg.set_main_option(
+        "script_location",
+        config.full_path("/migrations"),
+    )
+    command.upgrade(alembic_cfg, "head")
 
 
 class PaymentType(enum.Enum):
@@ -13,7 +28,10 @@ class PaymentType(enum.Enum):
 
 
 class User(SQLModel, table=True):
-    id: Optional[uuid.UUID] = Field(primary_key=True, default_factory=uuid.uuid4)
+    id: Optional[uuid.UUID] = Field(
+        primary_key=True,
+        default_factory=uuid.uuid4,
+    )
     created_at: datetime = Field(default_factory=datetime.now)
     name: str
     email: EmailStr = Field(sa_column=Column(String, index=True, unique=True))
@@ -24,7 +42,10 @@ class User(SQLModel, table=True):
 
 
 class Category(SQLModel, table=True):
-    id: Optional[uuid.UUID] = Field(primary_key=True, default_factory=uuid.uuid4)
+    id: Optional[uuid.UUID] = Field(
+        primary_key=True,
+        default_factory=uuid.uuid4,
+    )
     name: str
     user_id: uuid.UUID = Field(foreign_key="user.id")
     user: User = Relationship(back_populates="categories")
@@ -32,7 +53,10 @@ class Category(SQLModel, table=True):
 
 
 class Expense(SQLModel, table=True):
-    id: Optional[uuid.UUID] = Field(primary_key=True, default_factory=uuid.uuid4)
+    id: Optional[uuid.UUID] = Field(
+        primary_key=True,
+        default_factory=uuid.uuid4,
+    )
     date: date
     price: float
     payment_type: PaymentType
