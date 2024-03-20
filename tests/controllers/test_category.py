@@ -33,7 +33,8 @@ def test_create_category(
     created_category = Category(**payload["category"])
 
     assert created_category.name == category.name
-    assert str(created_category.user_id) == str(category.user_id) == str(user.id)
+    assert str(created_category.user_id) == str(category.user_id)
+    assert str(created_category.user_id) == str(user.id)
 
 
 def test_read_category(
@@ -114,7 +115,8 @@ def test_read_categories(
         db_category = Category(**payload["categories"][index])
 
         assert db_category.name == category.name
-        assert str(db_category.user_id) == str(category.user_id) == str(user.id)
+        assert str(db_category.user_id) == str(category.user_id)
+        assert str(db_category.user_id) == str(user.id)
 
 
 def test_read_categories_that_are_empty(

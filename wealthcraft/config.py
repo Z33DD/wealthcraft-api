@@ -32,6 +32,7 @@ class Settings(BaseSettings):
     pg_dsn: Optional[PostgresDsn] = None
     sqlite_dsn: str = "sqlite:///./db.sqlite"
     jwt: JWT = JWT()
+    allowed_origins: list[str] = ["http://localhost", "http://localhost:3000"]
 
     def build_engine(self) -> Engine:
         db_dsn = self.get_dsn()
@@ -58,7 +59,8 @@ class Settings(BaseSettings):
         return data["tool"]["poetry"]
 
     def full_path(self, path: str) -> str:
-        this_file_directory = os.path.dirname(os.path.abspath(inspect.stack()[0][1]))
+        this_file = os.path.abspath(inspect.stack()[0][1])
+        this_file_directory = os.path.dirname(this_file)
         root_directory = os.path.join(this_file_directory, "..")
 
         return root_directory + path

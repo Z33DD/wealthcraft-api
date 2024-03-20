@@ -1,10 +1,10 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from wealthcraft.config import Settings, settings
 from contextlib import asynccontextmanager
-from sqlmodel import SQLModel
 
 from wealthcraft.controllers import auth, user, category, expense
-from wealthcraft.models import *
+from wealthcraft.models import create_all_tables
 
 
 def server_factory(config: Settings) -> FastAPI:
@@ -13,8 +13,7 @@ def server_factory(config: Settings) -> FastAPI:
 
     @asynccontextmanager
     async def lifespan(app: FastAPI):
-        engine = config.build_engine()
-        SQLModel.metadata.create_all(engine)
+        create_all_tables()
 
         yield
 
@@ -23,6 +22,14 @@ def server_factory(config: Settings) -> FastAPI:
         version=meta["version"],
         description=meta["description"],
         lifespan=lifespan,
+    )
+
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=config.allowed_origins,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
     )
     app.include_router(auth.router)
     app.include_router(user.router)

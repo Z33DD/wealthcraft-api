@@ -14,10 +14,11 @@ def test_create_expense(
 ):
     user = user_factory()
     assert user.id is not None
-
-    expense: Expense = expense_factory(user)
-
     token = create_access_token(user)
+
+    expense = expense_factory(user)
+    assert expense.date
+
     response = test_client.post(
         "/expense/",
         json=json.loads(expense.model_dump_json()),

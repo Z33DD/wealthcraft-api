@@ -39,7 +39,11 @@ def hash_password(password: str) -> str:
 def verify_token(token: str) -> JWTPayload:
     config = settings.get()
     try:
-        decoded_token = jwt.decode(token, config.jwt.secret, algorithms=["HS256"])
+        decoded_token = jwt.decode(
+            token,
+            config.jwt.secret,
+            algorithms=["HS256"],
+        )
         return JWTPayload(**decoded_token)
     except jwt.PyJWTError:
         raise HTTPException(
@@ -75,8 +79,14 @@ def create_refresh_token(
 ) -> str:
     config = settings.get()
 
-    expiration = datetime.utcnow() + (expires_delta or config.jwt.refresh_expiration)
+    expiration = datetime.now(timezone.utc) + (
+        expires_delta or config.jwt.refresh_expiration
+    )
 
     to_encode = {"exp": expiration, "sub": str(subject)}
-    encoded_jwt = jwt.encode(to_encode, config.jwt.secret, config.jwt.algorithm)
+    encoded_jwt = jwt.encode(
+        to_encode,
+        config.jwt.secret,
+        config.jwt.algorithm,
+    )
     return encoded_jwt

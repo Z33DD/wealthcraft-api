@@ -72,6 +72,15 @@ class DAO:
     expense: BaseDAO[Expense]
 
     def __init__(self, session: Session):
-        self.user = BaseDAO[User](model_class=User, session=session)
-        self.category = BaseDAO[Category](model_class=Category, session=session)
-        self.expense = BaseDAO[Expense](model_class=Expense, session=session)
+        self.user = BaseDAO[User](
+            model_class=User,
+            session=session,
+        )
+        self.category = BaseDAO[Category](
+            model_class=Category,
+            session=session,
+        )
+        self.expense = BaseDAO[Expense](
+            model_class=Expense,
+            session=session,
+        )

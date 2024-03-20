@@ -49,14 +49,16 @@ def dao():
 @pytest.fixture
 def user_factory(dao: DAO, faker: Faker, faker_seed) -> Callable[..., User]:
     def factory(password: Optional[str] = None) -> User:
-        Faker.seed(0)
+        # Faker.seed(0)
 
         if not password:
             password = str(faker.password())
 
+        randint = str(random.randint(0, 100))
+
         user = User(
             name=faker.name(),
-            email=faker.email(),
+            email=randint + faker.email(),
             password=hash_password(password),
         )
         dao.user.add(user)

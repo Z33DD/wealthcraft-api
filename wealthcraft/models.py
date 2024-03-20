@@ -22,6 +22,12 @@ def execute_migration(db_url: str):
     command.upgrade(alembic_cfg, "head")
 
 
+def create_all_tables() -> None:
+    config = settings.get()
+    engine = config.build_engine()
+    SQLModel.metadata.create_all(engine)
+
+
 class PaymentType(enum.Enum):
     CREDIT = enum.auto()
     DEBIT = enum.auto()

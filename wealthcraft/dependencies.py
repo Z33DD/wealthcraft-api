@@ -5,6 +5,7 @@ from fastapi.security import OAuth2PasswordBearer
 
 from wealthcraft.config import settings
 from wealthcraft.dao import DAO
+from wealthcraft import logger
 from wealthcraft.models import User
 from wealthcraft.services import auth
 from datetime import datetime
@@ -28,7 +29,10 @@ def get_dao() -> Generator[DAO, Any, None]:
         try:
             session.commit()
         except sqlalchemy.exc.StatementError as ex:
-            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            logger.exception(ex)
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
 
 
 async def get_current_user(
