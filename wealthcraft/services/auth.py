@@ -1,6 +1,5 @@
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 import json
-from typing import Any, Optional
 from passlib.context import CryptContext
 from fastapi import HTTPException, status
 import jwt
@@ -16,7 +15,12 @@ class JWTPayload(BaseModel):
     user: User
 
 
-def authenticate_user(user: User, password: str):
+class RefreshJWTPayload(BaseModel):
+    exp: float
+    sub: str
+
+
+def authenticate_user(user: User, password: str) -> tuple[str, str]:
     login_error = HTTPException(
         status_code=status.HTTP_403_FORBIDDEN,
         detail="Incorrect password.",
@@ -27,7 +31,9 @@ def authenticate_user(user: User, password: str):
     if not verify_password(user.password, password):
         raise login_error
 
-    return create_access_token(user)
+    access_token = create_access_token(user)
+    refresh_token = create_refresh_token(user)
+    return access_token, refresh_token
 
 
 def hash_password(password: str) -> str:
@@ -45,6 +51,23 @@ def verify_token(token: str) -> JWTPayload:
             algorithms=["HS256"],
         )
         return JWTPayload(**decoded_token)
+    except jwt.PyJWTError:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Could not validate credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+
+def verify_refresh_token(token: str) -> RefreshJWTPayload:
+    config = settings.get()
+    try:
+        decoded_token = jwt.decode(
+            token,
+            config.jwt.secret,
+            algorithms=["HS256"],
+        )
+        return RefreshJWTPayload(**decoded_token)
     except jwt.PyJWTError:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -74,18 +97,29 @@ def create_access_token(user: User) -> str:
     return token
 
 
-def create_refresh_token(
-    subject: str | Any, expires_delta: Optional[timedelta] = None
+def create_access_token_from_refresh_token(
+    refresh_token: str,
+    user: User,
 ) -> str:
-    config = settings.get()
+    verify_refresh_token(refresh_token)
 
-    expiration = datetime.now(timezone.utc) + (
-        expires_delta or config.jwt.refresh_expiration
+    token = create_access_token(user)
+
+    return token
+
+
+def create_refresh_token(user: User) -> str:
+    config = settings.get()
+    assert user.id
+
+    expiration = datetime.now(timezone.utc) + (config.jwt.refresh_expiration)
+    payload = RefreshJWTPayload(
+        exp=expiration.timestamp(),
+        sub=str(user.id),
     )
 
-    to_encode = {"exp": expiration, "sub": str(subject)}
     encoded_jwt = jwt.encode(
-        to_encode,
+        payload.model_dump(),
         config.jwt.secret,
         config.jwt.algorithm,
     )
