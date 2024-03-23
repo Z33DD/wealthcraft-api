@@ -37,7 +37,7 @@ class BaseDAO(Generic[T]):
 
         return instances
 
-    def query_one(self, field: str, value: Any) -> T | None:
+    def query_one(self, field: Any, value: Any) -> T | None:
         statement = select(self.model_class).where(field == value)
         instance = self.session.exec(statement).first()
 

@@ -20,8 +20,11 @@ def server_factory(config: Settings) -> FastAPI:
     app = FastAPI(
         title=meta["name"],
         version=meta["version"],
+        summary=meta["summary"],
         description=meta["description"],
         lifespan=lifespan,
+        redoc_url="/docs",
+        docs_url=None,
     )
 
     app.add_middleware(
@@ -42,9 +45,10 @@ app = server_factory(Settings())
 
 
 @app.get("/")
-def root():
+def api_information():
     return {
         "name": app.title,
+        "summary": app.summary,
         "description": app.description,
         "version": app.version,
     }

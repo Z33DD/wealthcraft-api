@@ -29,8 +29,8 @@ def create_all_tables() -> None:
 
 
 class PaymentType(enum.Enum):
-    CREDIT = enum.auto()
-    DEBIT = enum.auto()
+    CREDIT = "CREDIT"
+    DEBIT = "DEBIT"
 
 
 class User(SQLModel, table=True):
@@ -53,6 +53,9 @@ class Category(SQLModel, table=True):
         default_factory=uuid.uuid4,
     )
     name: str
+    icon: str = "archive-box"
+    color: str = "slate-500"
+    split: bool = False
     user_id: uuid.UUID = Field(foreign_key="user.id")
     user: User = Relationship(back_populates="categories")
     expenses: list["Expense"] = Relationship()
@@ -66,6 +69,7 @@ class Expense(SQLModel, table=True):
     date: date
     price: float
     payment_type: PaymentType
+    realized: bool = True
     description: Optional[str] = None
     category_id: uuid.UUID = Field(foreign_key="category.id")
     user_id: uuid.UUID = Field(foreign_key="user.id")

@@ -1,3 +1,4 @@
+from datetime import date
 from typing import Optional
 import uuid
 from fastapi import APIRouter, Depends, status
@@ -20,6 +21,9 @@ async def create_expense(
     user: User = Depends(get_current_user),
 ) -> CreateUpdateResponse:
     expense.user = user
+    assert user.id is not None
+    expense.user_id = user.id
+    expense.date = date.fromisoformat(str(expense.date))
     dao.expense.add(expense)
 
     return CreateUpdateResponse(
@@ -36,7 +40,6 @@ class ReadExpenses(BaseResponse):
 async def read_expenses(
     user: User = Depends(get_current_user),
 ) -> ReadExpenses:
-
     return ReadExpenses(
         expenses=user.expenses,
     )

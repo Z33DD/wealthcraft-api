@@ -1,27 +1,33 @@
-import json
+from datetime import date
 from typing import Callable
 from fastapi.testclient import TestClient
 from fastapi import status
 
-from wealthcraft.models import Expense, User
+from wealthcraft.models import Category, Expense, User
 from wealthcraft.services.auth import create_access_token
 
 
 def test_create_expense(
     user_factory: Callable[..., User],
-    expense_factory: Callable[..., Expense],
+    category_factory: Callable[..., Category],
     test_client: TestClient,
+    faker,
 ):
     user = user_factory()
     assert user.id is not None
     token = create_access_token(user)
 
-    expense = expense_factory(user)
-    assert expense.date
+    category = category_factory(user)
 
     response = test_client.post(
         "/expense/",
-        json=json.loads(expense.model_dump_json()),
+        json={
+            "description": "expense.description",
+            "price": faker.random_number(digits=3),
+            "payment_type": "CREDIT",
+            "date": date.today().isoformat(),
+            "category_id": str(category.id),
+        },
         headers={"Authorization": f"Bearer {token}"},
     )
 
@@ -30,8 +36,8 @@ def test_create_expense(
 
     created_expense = Expense(**payload["expense"])
 
-    assert created_expense.name == expense.name
-    assert str(created_expense.user_id) == str(expense.user_id) == str(user.id)
+    assert created_expense.description == "expense.description"
+    assert str(created_expense.user_id) == str(user.id)
 
 
 def test_read_expense(

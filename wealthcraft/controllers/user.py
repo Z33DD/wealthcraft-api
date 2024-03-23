@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, EmailStr
 from wealthcraft.dao import DAO
 
@@ -15,8 +15,14 @@ class CreateUser(BaseModel):
     password: str
 
 
-@router.post("/account")
-async def create_account(user_data: CreateUser, dao: DAO = Depends(get_dao)):
+@router.post("/")
+async def create_user(user_data: CreateUser, dao: DAO = Depends(get_dao)):
+    existing_user = dao.user.query_one(User.email, user_data.email)
+    if existing_user:
+        raise HTTPException(
+            detail="User with this email already exists",
+            status_code=status.HTTP_400_BAD_REQUEST,
+        )
     user = User(
         name=user_data.name,
         email=user_data.email,

@@ -8,7 +8,13 @@ from fastapi.testclient import TestClient
 from sqlmodel import SQLModel, Session
 from wealthcraft.config import Settings, settings
 from wealthcraft.dao import DAO
-from wealthcraft.models import Category, Expense, PaymentType, User
+from wealthcraft.models import (
+    Category,
+    Expense,
+    PaymentType,
+    User,
+    create_all_tables,
+)
 from wealthcraft.server import server_factory
 from faker import Faker
 
@@ -25,6 +31,7 @@ def test_client() -> Generator[TestClient, Any, None]:
 
 @pytest.fixture(scope="session", autouse=True)
 def db_file():
+    create_all_tables()
     yield
     os.remove("./db.sqlite")
 

@@ -54,9 +54,18 @@ class Settings(BaseSettings):
         return pg_dsn or self.sqlite_dsn
 
     def metadata(self) -> dict:
+        metadata = {}
+
         with open("pyproject.toml", "rb") as f:
-            data = tomllib.load(f)
-        return data["tool"]["poetry"]
+            project_data = tomllib.load(f)
+        metadata.update(project_data["tool"]["poetry"])
+        metadata["summary"] = metadata["description"]
+
+        with open("README.md", "rb") as f:
+            readme = f.read().decode("utf-8")
+        metadata["description"] = readme
+
+        return metadata
 
     def full_path(self, path: str) -> str:
         this_file = os.path.abspath(inspect.stack()[0][1])

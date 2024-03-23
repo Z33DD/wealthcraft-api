@@ -44,7 +44,7 @@ def test(
     ] = False,
 ):
     args = [
-        # "--pylama",
+        "--pylama",
         "--no-header",
     ]
 
@@ -52,6 +52,17 @@ def test(
         args.append(f"-k {name}")
     if not warnings:
         args.append("--disable-warnings")
+
+    pytest.main(args)
+
+
+@app.command(help="Generates a coverage report.")
+def coverage():
+    args = [
+        "--cov=wealthcraft",
+        "--no-header",
+        "--disable-warnings",
+    ]
 
     pytest.main(args)
 
