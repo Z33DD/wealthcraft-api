@@ -21,6 +21,21 @@ class RefreshJWTPayload(BaseModel):
 
 
 def authenticate_user(user: User, password: str) -> tuple[str, str]:
+    """
+    Authenticates a user by verifying the provided
+    password against the user's stored password.
+
+    Args:
+        user (User): The user object to authenticate.
+        password (str): The password to verify.
+
+    Returns:
+        tuple[str, str]: A tuple containing the access token and refresh token.
+
+    Raises:
+        HTTPException: If the password is incorrect or
+            the user's password is not set.
+    """
     login_error = HTTPException(
         status_code=status.HTTP_403_FORBIDDEN,
         detail="Incorrect password.",
@@ -81,6 +96,16 @@ def verify_password(real_password: str, password: str) -> bool:
 
 
 def create_access_token(user: User) -> str:
+    """
+    Creates an access token for the given user.
+
+    Args:
+        user (User): The user for whom the access token is being created.
+
+    Returns:
+        str: The access token.
+
+    """
     config = settings.get()
     exp = datetime.now(tz=timezone.utc) + config.jwt.expiration
     payload = JWTPayload(
