@@ -26,9 +26,16 @@ class BaseDAO(Generic[T]):
             self.cache.update({str(id): instance})
         return instance
 
-    def query(self, field: str, value: Any) -> list[T]:
+    def query(
+        self,
+        field: str,
+        value: Any,
+        offset: int = 0,
+        limit: int = 100,
+    ) -> list[T]:
         statement = select(self.model_class).where(field == value)
-        results = self.session.exec(statement).all()
+        paginated_statement = statement.offset(offset).limit(limit)
+        results = self.session.exec(paginated_statement).all()
 
         instances = []
         for instance in results:
@@ -46,9 +53,10 @@ class BaseDAO(Generic[T]):
 
         return instance
 
-    def all(self) -> list[T]:
+    def all(self, offset: int = 0, limit: int = 100) -> list[T]:
         statement = select(self.model_class)
-        results = self.session.exec(statement).all()
+        paginated_statement = statement.offset(offset).limit(limit)
+        results = self.session.exec(paginated_statement).all()
 
         instances = []
         for instance in results:

@@ -32,17 +32,20 @@ async def create_expense(
     )
 
 
-class ReadExpenses(BaseResponse):
-    expenses: list[Expense]
-
-
 @router.get("/", status_code=status.HTTP_200_OK)
 async def read_expenses(
+    offset: int = 0,
+    limit: int = 100,
     user: User = Depends(get_current_user),
-) -> ReadExpenses:
-    return ReadExpenses(
-        expenses=user.expenses,
+    dao: DAO = Depends(get_dao),
+) -> list[Expense]:
+    expenses = dao.expense.query(
+        "user_id",
+        user.id,
+        offset=offset,
+        limit=limit,
     )
+    return expenses
 
 
 class ReadExpense(BaseResponse):
