@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 from wealthcraft.dao import DAO
 
 from wealthcraft.dependencies import get_dao
@@ -8,6 +8,7 @@ from wealthcraft.services.auth import (
     authenticate_user,
     create_access_token_from_refresh_token,
 )
+from wealthcraft.config import settings
 
 router = APIRouter(prefix="/auth")
 
@@ -22,6 +23,7 @@ class LoginResponseSchema(BaseModel):
     refresh_token: str
     token_type: str
     user_id: str
+    expiration: int = Field(..., description="Token expiration in seconds")
 
 
 @router.post("/login", status_code=status.HTTP_200_OK)
@@ -36,12 +38,14 @@ async def authenticate(
         )
 
     token, refresh_token = authenticate_user(user, credentials.password)
+    config = settings.get()
 
     return LoginResponseSchema(
         access_token=token,
         refresh_token=refresh_token,
         token_type="bearer",
         user_id=str(user.id),
+        expiration=config.jwt.expiration.seconds,
     )
 
 
@@ -49,6 +53,7 @@ class RefreshResponseSchema(BaseModel):
     access_token: str
     token_type: str
     user_id: str
+    expiration: int = Field(..., description="Token expiration in seconds")
 
 
 @router.post("/refresh", status_code=status.HTTP_200_OK)
@@ -63,9 +68,11 @@ async def refresh_token(
         )
 
     token = create_access_token_from_refresh_token(refresh_token, user)
+    config = settings.get()
 
     return RefreshResponseSchema(
         access_token=token,
         token_type="bearer",
         user_id=str(user.id),
+        expiration=config.jwt.expiration.seconds,
     )
