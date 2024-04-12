@@ -56,9 +56,13 @@ class RefreshResponseSchema(BaseModel):
     expiration: int = Field(..., description="Token expiration in seconds")
 
 
+class RefreshRequestSchema(BaseModel):
+    refresh_token: str
+
+
 @router.post("/refresh", status_code=status.HTTP_200_OK)
 async def refresh_token(
-    refresh_token: str, dao: DAO = Depends(get_dao)
+    body: RefreshRequestSchema, dao: DAO = Depends(get_dao)
 ) -> RefreshResponseSchema:
     user = dao.user.query_one(User.id, refresh_token)
     if not user:
@@ -67,7 +71,7 @@ async def refresh_token(
             detail="User not found.",
         )
 
-    token = create_access_token_from_refresh_token(refresh_token, user)
+    token = create_access_token_from_refresh_token(body.refresh_token, user)
     config = settings.get()
 
     return RefreshResponseSchema(
